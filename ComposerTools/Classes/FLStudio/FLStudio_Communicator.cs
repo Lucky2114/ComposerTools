@@ -15,6 +15,8 @@ namespace ComposerTools.Classes.FLStudio
         [DllImport("user32.dll")]
         static extern bool SetForegroundWindow(IntPtr hWnd);
 
+        private const string flstudioExePath = @"D:\Programs\FL Studio 20\FL64.exe";
+
         private static FLStudio_Communicator instance;
 
         TestStack.White.UIItems.WindowItems.Window window = null;
@@ -75,6 +77,7 @@ namespace ComposerTools.Classes.FLStudio
                 Point p = itemToClick.Location;
                 p.Offset(11, 12);
                 mouse.Click(p);
+                Thread.Sleep(500);
                 SendKeys.SendWait("f");
                 SendKeys.SendWait("p");
                 SendKeys.Flush();
@@ -86,8 +89,8 @@ namespace ComposerTools.Classes.FLStudio
 
         public void openFlStudio()
         {
-            TestStack.White.Application application = TestStack.White.Application.Launch(@"C:\Program Files (x86)\Image-Line\FL Studio 20\FL.exe");
-            this.window = application.GetWindow("FL Studio 20", InitializeOption.NoCache);
+            TestStack.White.Application application = TestStack.White.Application.Launch(flstudioExePath);
+            this.window = application.GetWindow("FL Studio 20");
             this.windowHandle = application.Process.Handle;
             Logger.Log($"Recived window Handle: {windowHandle}");
 
