@@ -50,6 +50,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
@@ -64,6 +65,7 @@
     <Reference Include="TestStack.White, Version=0.13.0.0, Culture=neutral, PublicKeyToken=2672efbf3e161801, processorArchitecture=MSIL">
       <HintPath>..\packages\TestStack.White.0.13.3\lib\net40\TestStack.White.dll</HintPath>
     </Reference>
+    <Reference Include="UIAutomationClient" />
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -75,6 +77,7 @@
     </ApplicationDefinition>
     <Compile Include="Classes\Controller.cs" />
     <Compile Include="Classes\FLStudio\FLStudio_Communicator.cs" />
+    <Compile Include="Classes\FLStudio\FL_Interaction.cs" />
     <Compile Include="Classes\Logger.cs" />
     <Compile Include="Classes\MIDI\Midi_Communicator.cs" />
     <Compile Include="Classes\MIDI\Midi_Exchanger.cs" />

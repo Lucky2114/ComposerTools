@@ -2,6 +2,7 @@
 using ComposerTools.Classes.SystemInteraction;
 using System;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows;
 using System.Windows.Forms;
 using TestStack.White.Factory;
@@ -30,6 +31,7 @@ namespace ComposerTools.View
         {
             FLStudio_Communicator.getInstance().openFlStudio();
         }
+
     }
 }
 
