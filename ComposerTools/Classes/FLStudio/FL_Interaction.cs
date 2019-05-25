@@ -1,59 +1,73 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Forms;
 using TestStack.White.UIItems;
-using Point = System.Windows.Point;
 
 namespace ComposerTools.Classes.FLStudio
 {
     class FL_Interaction
     {
+        //TODO: Find faster way to iterate through window controls
+
         [DllImport("User32.dll")]
         public static extern int SendMessage(IntPtr hWnd, int uMsg, int wParam, string lParam);
         [DllImport("user32.dll")]
         static extern bool SetForegroundWindow(IntPtr hWnd);
 
-        //If it's allready open -> returns true. If it's closed it opens it and returns true.
+        //If it's allready open -> returns true. If it's closed it tries opens it.
         public static void openPianoRollContextMenu(IntPtr windowHandle, TestStack.White.UIItems.WindowItems.Window window)
         {
             TestStack.White.UIItems.Panel itemToClick = null;
-            System.Windows.Clipboard.Clear();
-            System.Windows.Forms.Clipboard.Clear();
 
-            if (!isPianoRollContextMenuOpen(windowHandle, window))
+            //TODO: use isPianoRollContextMenuOpen?
+            //if (!isPianoRollContextMenuOpen(windowHandle, window))
+            //{
+            UIItemCollection coll = window.Items;
+            foreach (UIItem item in coll)
             {
-                UIItemCollection coll = window.Items;
-                foreach (UIItem item in coll)
+                if (item.Name.Contains("Piano roll"))
                 {
-                    if (item.Name.Contains("Piano roll"))
+                    if (((TestStack.White.UIItems.Panel)item).Items.Count == 0)
                     {
-                        if (((TestStack.White.UIItems.Panel)item).Items.Count == 0)
-                        {
-                            itemToClick = (TestStack.White.UIItems.Panel)item;
-                            break;
-                        }
+                        itemToClick = (TestStack.White.UIItems.Panel)item;
+                        break;
                     }
                 }
-                //Check if it's open:
-
-                bool focus = SetForegroundWindow(windowHandle);
-                if (focus)
-                {
-                    var mouse = window.Mouse;
-                    Point p = itemToClick.Location;
-                    p.Offset(11, 12);
-                    mouse.Click(p);
-                }
             }
+            //TODO: Focus alway returns false
+            bool focus = SetForegroundWindow(windowHandle);
+            if (focus)
+            {
+                var mouse = window.Mouse;
+                Point p = itemToClick.Location;
+                p.Offset(11, 12);
+                mouse.Click(p);
+            }
+            else
+            {
+                //Do it as well, but log it
+                Debug.Print("Failed to focus window");
+                var mouse = window.Mouse;
+                Point p = itemToClick.Location;
+                p.Offset(11, 12);
+                mouse.Click(p);
+            }
+            //}
         }
 
-        public static void openPianoRollContextMenuFile(IntPtr windowHandle, TestStack.White.UIItems.WindowItems.Window window)
+        public static bool openPianoRollContextMenuFile(IntPtr windowHandle, TestStack.White.UIItems.WindowItems.Window window)
         {
+            bool res = false;
             //TODO: FIX THIS
-            if (isPianoRollContextSubMenuOpen(windowHandle, window))
-                openPianoRollContextMenu(windowHandle, window);
+            //  if (isPianoRollContextSubMenuOpen(windowHandle, window))
+            // {
             SendKeys.SendWait("f"); //->File
+            res = true;
+            // }
+            return res;
         }
 
         public static void pianoRollCopyMidiToClipBoard()
@@ -66,8 +80,15 @@ namespace ComposerTools.Classes.FLStudio
             bool focus = SetForegroundWindow(windowHandle);
             foreach (var item in window.Items)
             {
-                AutomationElement automationElement = item.AutomationElement;
-                if (automationElement.Current.ClassName.Equals("TQuickPopupMenuWindow"))
+                try
+                {
+                    AutomationElement automationElement = item.AutomationElement;
+                    if (automationElement.Current.ClassName.Equals("TQuickPopupMenuWindow"))
+                    {
+                        return true;
+                    }
+                }
+                catch
                 {
                     return true;
                 }

@@ -22,9 +22,10 @@ namespace ComposerTools.Classes.SystemInteraction
 
         private void OnAltP(object sender, HotkeyEventArgs e)
         {
-            MidiFile midiRaw = Midi_Communicator.getMidiFromFL();
+            MidiFile midiRaw = Midi_Communicator.GetMidiFromFL();
             MidiFile processedMidi = new Midi_Processor(midiRaw).removeNote();
-            Midi_Communicator.setMidiToFL(processedMidi);
+            Thread.Sleep(200); //Delay because otherwise context menu may still be open
+            Midi_Communicator.SendMidiToFL(processedMidi);
         }
     }
 }

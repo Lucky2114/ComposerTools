@@ -11,16 +11,18 @@ namespace ComposerTools.Classes.MIDI
 {
     class Midi_Communicator
     {
-        public static MidiFile getMidiFromFL()
+        public static MidiFile GetMidiFromFL()
         {
+            System.Windows.Clipboard.Clear();
+            System.Windows.Forms.Clipboard.Clear();
             FLStudio_Communicator.getInstance().getClipboardFromFL();
-            return Midi_Exchanger.getMidiFromClipboard();
+            return Midi_Exchanger.GetMidiFromClipboard();
         }
 
-        public static void setMidiToFL(MidiFile midi)
+        public static void SendMidiToFL(MidiFile midi)
         {
-            Midi_Exchanger.setMidiToClipboard(midi);
-            FLStudio_Communicator.getInstance().sendClipboardToFLStudio();
+            Midi_Exchanger.SetMidiToClipboard(midi);
+            FLStudio_Communicator.getInstance().SendClipboardToFLStudio();
         }
     }
 }

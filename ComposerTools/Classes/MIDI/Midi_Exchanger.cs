@@ -9,7 +9,7 @@ namespace ComposerTools.Classes.MIDI
     class Midi_Exchanger
     {
         private static readonly string midiFormat = "Standard MIDI File";
-        public static MidiFile getMidiFromClipboard()
+        public static MidiFile GetMidiFromClipboard()
         {  
             if (midiFormat.Equals(Clipboard.GetDataObject().GetFormats().FirstOrDefault()))
             {
@@ -22,7 +22,7 @@ namespace ComposerTools.Classes.MIDI
             }
         }
 
-        public static void setMidiToClipboard(MidiFile midi)
+        public static void SetMidiToClipboard(MidiFile midi)
         {
             byte[] result;
             using (MemoryStream ms2 = new MemoryStream())
