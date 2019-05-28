@@ -24,7 +24,7 @@ namespace ComposerTools.Classes.SystemInteraction
         {
             MidiFile midiRaw = Midi_Communicator.GetMidiFromFL();
             MidiFile processedMidi = new Midi_Processor(midiRaw).removeNote();
-            Thread.Sleep(200); //Delay because otherwise context menu may still be open
+            Thread.Sleep(1000); //Delay because otherwise context menu may still be open
             Midi_Communicator.SendMidiToFL(processedMidi);
         }
     }

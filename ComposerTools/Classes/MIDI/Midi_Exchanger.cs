@@ -6,15 +6,16 @@ using System.Windows;
 
 namespace ComposerTools.Classes.MIDI
 {
-    class Midi_Exchanger
+    internal class Midi_Exchanger
     {
         private static readonly string midiFormat = "Standard MIDI File";
+
         public static MidiFile GetMidiFromClipboard()
-        {  
+        {
             if (midiFormat.Equals(Clipboard.GetDataObject().GetFormats().FirstOrDefault()))
             {
                 MemoryStream ms = (MemoryStream)Clipboard.GetDataObject().GetData(midiFormat);
-                return MidiFile.Read(ms); 
+                return MidiFile.Read(ms);
             }
             else
             {

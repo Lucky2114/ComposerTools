@@ -11,7 +11,7 @@ namespace ComposerTools.Classes.FLStudio
     {
         private static FLStudio_Communicator instance;
 
-        private const string flStudioPath = @"D:\Programs\FL Studio 20\FL64.exe";
+        private const string flStudioPath = @"C:\Program Files (x86)\Image-Line\FL Studio 20\FL64.exe";
 
         TestStack.White.UIItems.WindowItems.Window window = null;
         IntPtr windowHandle;
@@ -35,7 +35,7 @@ namespace ComposerTools.Classes.FLStudio
         {
             FL_Interaction.openPianoRollContextMenu(windowHandle, window);
             FL_Interaction.openPianoRollContextMenuFile(windowHandle, window);
-            Thread.Sleep(100); //This delay is needed because of the animation (fade in) of the context menu
+            Thread.Sleep(400); //This delay is needed because of the animation (fade in) of the context menu
             SendKeys.SendWait("c"); //->Copy Midi To Clipboard
             
             SendKeys.Flush();
