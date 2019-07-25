@@ -76,6 +76,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Classes\Controller.cs" />
+    <Compile Include="Classes\DLL Injection\Injector.cs" />
     <Compile Include="Classes\FLStudio\FLStudio_Communicator.cs" />
     <Compile Include="Classes\FLStudio\FL_Interaction.cs" />
     <Compile Include="Classes\Logger.cs" />
@@ -123,6 +124,12 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\flparser\Monad.FLParser.csproj">
+      <Project>{ce83037e-41aa-4c72-be2e-1df90583ad17}</Project>
+      <Name>Monad.FLParser</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

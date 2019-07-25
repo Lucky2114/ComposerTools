@@ -15,14 +15,14 @@ namespace ComposerTools.Classes.MIDI
         {
             System.Windows.Clipboard.Clear();
             System.Windows.Forms.Clipboard.Clear();
-            FLStudio_Communicator.getInstance().getClipboardFromFL();
+            FLStudio_Communicator.GetInstance().getClipboardFromFL();
             return Midi_Exchanger.GetMidiFromClipboard();
         }
 
         public static void SendMidiToFL(MidiFile midi)
         {
             Midi_Exchanger.SetMidiToClipboard(midi);
-            FLStudio_Communicator.getInstance().SendClipboardToFLStudio();
+            FLStudio_Communicator.GetInstance().SendClipboardToFLStudio();
         }
     }
 }

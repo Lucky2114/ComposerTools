@@ -17,7 +17,7 @@ namespace ComposerTools.Classes.FLStudio
         IntPtr windowHandle;
         TestStack.White.UIItems.Panel itemToClick = null;
 
-        public static FLStudio_Communicator getInstance()
+        public static FLStudio_Communicator GetInstance()
         {
             if (instance == null)
             {
@@ -35,7 +35,7 @@ namespace ComposerTools.Classes.FLStudio
         {
             FL_Interaction.openPianoRollContextMenu(windowHandle, window);
             FL_Interaction.openPianoRollContextMenuFile(windowHandle, window);
-            Thread.Sleep(400); //This delay is needed because of the animation (fade in) of the context menu
+            Thread.Sleep(1000); //This delay is needed because of the animation (fade in) of the context menu
             SendKeys.SendWait("c"); //->Copy Midi To Clipboard
             
             SendKeys.Flush();
@@ -54,7 +54,7 @@ namespace ComposerTools.Classes.FLStudio
 
         }
 
-        public void openFlStudio()
+        public void OpenFlStudio()
         {
             TestStack.White.Application application = TestStack.White.Application.Launch(flStudioPath);
             this.window = application.GetWindow("FL Studio 20", InitializeOption.NoCache);

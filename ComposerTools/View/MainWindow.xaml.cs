@@ -29,7 +29,7 @@ namespace ComposerTools.View
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            FLStudio_Communicator.getInstance().openFlStudio();
+            FLStudio_Communicator.GetInstance().OpenFlStudio();
         }
 
     }
