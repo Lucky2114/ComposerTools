@@ -4,31 +4,70 @@
              xmlns:local="clr-namespace:ComposerTools"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
+        <!-- Window Top Bar (Copy into the grid of your mainwindow) make sure windowstyle is set to none -->
+        <!--
+        <Grid Height="24" VerticalAlignment="Top">
+            <Rectangle Fill="{StaticResource Window.Static.TopBar}" Height="24" VerticalAlignment="Top" MouseDown="Rectangle_MouseDown" MouseLeftButtonDown="Rectangle_MouseLeftButtonDown" />
+            <Button x:Name="button_close" Content="&#xD;&#xA;" HorizontalAlignment="Right" VerticalAlignment="Top" BorderBrush="{x:Null}" Foreground="{x:Null}" Width="24" Click="Button_close_Click" Style="{DynamicResource ButtonStyle_DarkNoText}">
+                <Button.Background>
+                    <ImageBrush ImageSource="Content/buttonClose_transparent2.png" Stretch="None" />
+                </Button.Background>
+            </Button>
+            <Button x:Name="button_max" Content="&#xA;" HorizontalAlignment="Right" VerticalAlignment="Top" BorderBrush="{x:Null}" Foreground="{x:Null}" Width="24" Margin="0,0,24,0" Click="Button_maximize_Click" Style="{DynamicResource ButtonStyle_DarkNoText}">
+                <Button.Background>
+                    <ImageBrush ImageSource="Content/buttonMax_transparent.png" Stretch="None" />
+                </Button.Background>
+            </Button>
+            <Button x:Name="button_minimize" Content="&#xA;" HorizontalAlignment="Right" VerticalAlignment="Top" BorderBrush="{x:Null}" Foreground="{x:Null}" Width="24" Margin="0,0,48,0" Click="Button_minimize_Click" Tag="test123" Style="{DynamicResource ButtonStyle_DarkNoText}">
+                <Button.Background>
+                    <ImageBrush ImageSource="Content/buttonMin.png" Stretch="None" />
+                </Button.Background>
+            </Button>
+        </Grid>
+        -->
+
         <!--____________________________________________________________________-->
         <!--//_______________________Colors (Change here)______________________\\-->
         <!--___________________________________________________________________-->
 
+        <SolidColorBrush x:Key="Color.Static.Foreground" Color="#B4BAC4" />
+        <SolidColorBrush x:Key="Color.MouseOver.Foreground" Color="#FAFAFB" />
+        <SolidColorBrush x:Key="Color.Pressed.Foreground" Color="#FFFFFF" />
+        <SolidColorBrush x:Key="Color.Disabled.Foreground" Color="#444649" />
+
+        <SolidColorBrush x:Key="Color.Static.Background" Color="Transparent" />
+        <SolidColorBrush x:Key="Color.MouseOver.Background" Color="#131416" />
+        <SolidColorBrush x:Key="Color.Pressed.Background" Color="#0D0D0F" />
+        <SolidColorBrush x:Key="Color.Disabled.Background" Color="Transparent" />
+
+        <SolidColorBrush x:Key="Color.Static.Border" Color="#B4BAC4" />
+        <SolidColorBrush x:Key="Color.MouseOver.Border" Color="#FAFAFB" />
+        <SolidColorBrush x:Key="Color.Pressed.Border" Color="#FFFFFF" />
+        <SolidColorBrush x:Key="Color.Disabled.Border" Color="#6E7279" />
 
         <!--Button-->
-        <SolidColorBrush x:Key="Button.Static.Background" Color="Transparent"/>
-        <SolidColorBrush x:Key="Button.Static.Border" Color="Transparent"/>
-        <SolidColorBrush x:Key="Button.Static.Foreground" Color="#63666C"/>
-        <SolidColorBrush x:Key="Button.MouseOver.Background" Color="#292B2F"/>
-        <SolidColorBrush x:Key="Button.MouseOver.Border" Color="Transparent"/>
-        <SolidColorBrush x:Key="Button.MouseOver.Foreground" Color="#FAFAFB"/>
-        <SolidColorBrush x:Key="Button.Pressed.Background" Color="#202225"/>
-        <SolidColorBrush x:Key="Button.Pressed.Border" Color="Transparent"/>
-        <SolidColorBrush x:Key="Button.Pressed.Foreground" Color="#FAFAFB"/>
-        <SolidColorBrush x:Key="Button.Disabled.Background" Color="Transparent"/>
-        <SolidColorBrush x:Key="Button.Disabled.Border" Color="Transparent"/>
-        <SolidColorBrush x:Key="Button.Disabled.Foreground" Color="#444649"/>
-        <!--Window-->
-        <SolidColorBrush x:Key="Window.Static.TopBar" Color="#202225"/> 
-        <SolidColorBrush x:Key="Window.Static.SecondaryContent" Color="#2F3136"/>
-        <SolidColorBrush x:Key="Window.Static.MainContent" Color="#36393F"/>
-        <SolidColorBrush x:Key="Window.Static.Foreground" Color="#5B5F64"/>
-        <SolidColorBrush x:Key="Window.Hover.Foreground" Color="#FAFAFB"/> 
 
+        <!--Window-->
+        <SolidColorBrush x:Key="Window.Static.TopBar" Color="#0F1011" />
+        <SolidColorBrush x:Key="Window.Static.BG_SecondaryContent" Color="#191B1E" />
+        <SolidColorBrush x:Key="Window.Static.BG_MainContent" Color="#36393F" />
+        <SolidColorBrush x:Key="Window.Static.Foreground" Color="#F4F4F5" />
+        <SolidColorBrush x:Key="Window.Hover.Foreground" Color="#FFFFFF" />
+        <!--ListBox-->
+
+        <!--___________________________________________________________________-->
+        <!--//_____________________FocusVisual Dark Style_____________________\\-->
+        <!--___________________________________________________________________-->
+
+        <Style x:Key="FocusVisualStyle_Dark">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Rectangle Margin="2" Opacity="0.5" SnapsToDevicePixels="true" Fill="{StaticResource Color.MouseOver.Background}" />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
         <!--___________________________________________________________________-->
         <!--//_______________________Window Dark Style_______________________\\-->
@@ -37,30 +76,30 @@
             <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
                 <Grid>
                     <AdornerDecorator>
-                        <ContentPresenter/>
+                        <ContentPresenter />
                     </AdornerDecorator>
-                    <ResizeGrip x:Name="WindowResizeGrip" HorizontalAlignment="Right" IsTabStop="false" Visibility="Collapsed" VerticalAlignment="Bottom"/>
+                    <ResizeGrip x:Name="WindowResizeGrip" HorizontalAlignment="Right" IsTabStop="false" Visibility="Collapsed" VerticalAlignment="Bottom" />
                 </Grid>
             </Border>
             <ControlTemplate.Triggers>
                 <MultiTrigger>
                     <MultiTrigger.Conditions>
-                        <Condition Property="ResizeMode" Value="CanResizeWithGrip"/>
-                        <Condition Property="WindowState" Value="Normal"/>
+                        <Condition Property="ResizeMode" Value="CanResizeWithGrip" />
+                        <Condition Property="WindowState" Value="Normal" />
                     </MultiTrigger.Conditions>
-                    <Setter Property="Visibility" TargetName="WindowResizeGrip" Value="Visible"/>
+                    <Setter Property="Visibility" TargetName="WindowResizeGrip" Value="Visible" />
                 </MultiTrigger>
             </ControlTemplate.Triggers>
         </ControlTemplate>
         <Style x:Key="WindowStyle_Dark" TargetType="{x:Type Window}">
-            <Setter Property="Foreground" Value="{StaticResource Window.Static.Foreground}"/>
-            <Setter Property="Background" Value="{StaticResource Window.Static.MainContent}"/>
+            <Setter Property="Foreground" Value="{StaticResource Window.Static.Foreground}" />
+            <Setter Property="Background" Value="{StaticResource Window.Static.BG_SecondaryContent}" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Window}">
                         <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
                             <AdornerDecorator>
-                                <ContentPresenter/>
+                                <ContentPresenter />
                             </AdornerDecorator>
                         </Border>
                     </ControlTemplate>
@@ -68,53 +107,359 @@
             </Setter>
             <Style.Triggers>
                 <Trigger Property="ResizeMode" Value="CanResizeWithGrip">
-                    <Setter Property="Template" Value="{StaticResource WindowTemplateKey}"/>
+                    <Setter Property="Template" Value="{StaticResource WindowTemplateKey}" />
                 </Trigger>
             </Style.Triggers>
         </Style>
 
+        <!--___________________________________________________________________-->
+        <!--//_______________________Button Dark Style No Border_____________\\-->
+        <!--___________________________________________________________________-->
+        <Style x:Key="ButtonStyle_DarkNoBorder" TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="{StaticResource Color.Static.Background}" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="Foreground" Value="{StaticResource Color.Static.Foreground}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualStyle_Dark}" />
 
-        <!--___________________________________________________________________-->
-        <!--//_______________________Button Dark Style_______________________\\-->
-        <!--___________________________________________________________________-->
-        <Style x:Key="ButtonStyle_Dark" TargetType="{x:Type Button}">
-            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
-            <Setter Property="Background" Value="{StaticResource Button.Static.Background}"/>
-            <Setter Property="BorderBrush" Value="{StaticResource Button.Static.Border}"/>
-            <Setter Property="Foreground" Value="{StaticResource Button.Static.Foreground}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Padding" Value="1"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
-                        <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true" CornerRadius="3">
-                            <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true" CornerRadius="4">
+                            <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsDefaulted" Value="true">
-                                <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{StaticResource Button.Static.Foreground}"/>
-                                <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                                <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{StaticResource Color.Static.Foreground}" />
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="true">
-                                <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{StaticResource Button.MouseOver.Foreground}"/>
-                                <Setter Property="Background" TargetName="border" Value="{StaticResource Button.MouseOver.Background}"/>
-                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.MouseOver.Border}"/>
+                                <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{StaticResource Color.MouseOver.Foreground}" />
+                                <Setter Property="Background" TargetName="border" Value="{StaticResource Color.MouseOver.Background}" />
                             </Trigger>
                             <Trigger Property="IsPressed" Value="true">
-                                <Setter Property="Background" TargetName="border" Value="{StaticResource Button.Pressed.Background}"/>
-                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.Pressed.Border}"/>
+                                <Setter Property="Background" TargetName="border" Value="{StaticResource Color.Pressed.Background}" />
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="false">
-                                <Setter Property="Background" TargetName="border" Value="{StaticResource Button.Disabled.Background}"/>
-                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.Disabled.Border}"/>
-                                <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{StaticResource Button.Disabled.Foreground}"/>
+                                <Setter Property="Background" TargetName="border" Value="{StaticResource Color.Disabled.Background}" />
+                                <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{StaticResource Color.Disabled.Foreground}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+        </Style>
+
+        <!--___________________________________________________________________-->
+        <!--//_________________Button Dark Style (With Border)_______________\\-->
+        <!--___________________________________________________________________-->
+        <Style x:Key="ButtonStyle_Dark" TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="{StaticResource Color.Static.Background}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Color.Static.Border}" />
+            <Setter Property="Foreground" Value="{StaticResource Color.Static.Foreground}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualStyle_Dark}" />
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true" CornerRadius="4">
+                            <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsDefaulted" Value="true">
+                                <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{StaticResource Color.Static.Foreground}" />
+                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Color.Static.Border}" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{StaticResource Color.MouseOver.Foreground}" />
+                                <Setter Property="Background" TargetName="border" Value="{StaticResource Color.MouseOver.Background}" />
+                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Color.MouseOver.Border}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="true">
+                                <Setter Property="Background" TargetName="border" Value="{StaticResource Color.Pressed.Background}" />
+                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Color.Pressed.Border}" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Background" TargetName="border" Value="{StaticResource Color.Disabled.Background}" />
+                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Color.Disabled.Border}" />
+                                <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{StaticResource Color.Disabled.Foreground}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--___________________________________________________________________-->
+        <!--//____________________Button Dark Style No Text__________________\\-->
+        <!--___________________________________________________________________-->
+        <Style x:Key="ButtonStyle_DarkNoText" TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="{StaticResource Color.Static.Background}" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="Foreground" Value="{StaticResource Color.Static.Foreground}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualStyle_Dark}" />
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
+                            <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsDefaulted" Value="true">
+                                <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{StaticResource Color.Static.Foreground}" />
+                                <Setter Property="BorderBrush" TargetName="border" Value="Transparent" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{StaticResource Color.MouseOver.Foreground}" />
+                                <Setter Property="Opacity" Value="0.5" />
+                                <Setter Property="BorderBrush" TargetName="border" Value="Transparent" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="true">
+                                <Setter Property="Opacity" Value="0.2" />
+                                <Setter Property="BorderBrush" TargetName="border" Value="Transparent" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Background" TargetName="border" Value="{StaticResource Color.Disabled.Background}" />
+                                <Setter Property="BorderBrush" TargetName="border" Value="Transparent" />
+                                <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{StaticResource Color.Disabled.Foreground}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--___________________________________________________________________-->
+        <!--//_______________________ListBox Dark Style______________________\\-->
+        <!--___________________________________________________________________-->
+
+        <Style x:Key="ListBoxStyle_Dark" TargetType="{x:Type ListBox}">
+            <Setter Property="Background" Value="{StaticResource Color.Static.Background}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Color.Static.Border}" />
+            <Setter Property="Foreground" Value="{StaticResource Color.Static.Foreground}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+            <Setter Property="ScrollViewer.CanContentScroll" Value="true" />
+            <Setter Property="ScrollViewer.PanningMode" Value="Both" />
+            <Setter Property="Stylus.IsFlicksEnabled" Value="False" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualStyle_Dark}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ListBox}">
+                        <Border x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Padding="1" SnapsToDevicePixels="true" CornerRadius="4">
+                            <ScrollViewer Focusable="false" Padding="{TemplateBinding Padding}">
+                                <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                            </ScrollViewer>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Background" TargetName="Bd" Value="{StaticResource Color.Disabled.Background}" />
+                                <Setter Property="BorderBrush" TargetName="Bd" Value="{StaticResource Color.Disabled.Border}" />
+                            </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsGrouping" Value="true" />
+                                    <Condition Property="VirtualizingPanel.IsVirtualizingWhenGrouping" Value="false" />
+                                </MultiTrigger.Conditions>
+                                <Setter Property="ScrollViewer.CanContentScroll" Value="false" />
+                            </MultiTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--___________________________________________________________________-->
+        <!--//_______________________Label Dark Style________________________\\-->
+        <!--___________________________________________________________________-->
+
+        <Style x:Key="LabelStyle_Dark" TargetType="{x:Type Label}">
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualStyle_Dark}" />
+            <Setter Property="Foreground" Value="{StaticResource Color.Static.Foreground}" />
+            <Setter Property="Background" Value="{StaticResource Color.Static.Background}" />
+            <Setter Property="Padding" Value="5" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="VerticalContentAlignment" Value="Top" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Label}">
+                        <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="true">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="{StaticResource Color.Static.Foreground}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--___________________________________________________________________-->
+        <!--//_____________________CheckBox Dark Style_______________________\\-->
+        <!--___________________________________________________________________-->
+
+        <Style x:Key="CheckBoxStyle_Dark" TargetType="{x:Type CheckBox}">
+            <Setter Property="Background" Value="{StaticResource Color.Static.Background}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Color.Static.Border}" />
+            <Setter Property="Foreground" Value="{StaticResource Color.Static.Foreground}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualStyle_Dark}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type CheckBox}">
+                        <Grid x:Name="templateRoot" Background="Transparent" SnapsToDevicePixels="True">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Border x:Name="checkBoxBorder" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="1" VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                                <Grid x:Name="markGrid">
+                                    <Path x:Name="optionMark" Data="F1 M 9.97498,1.22334L 4.6983,9.09834L 4.52164,9.09834L 0,5.19331L 1.27664,3.52165L 4.255,6.08833L 8.33331,1.52588e-005L 9.97498,1.22334 Z " Fill="{StaticResource Color.Static.Foreground}" Margin="1" Opacity="0" Stretch="None" />
+                                    <Rectangle x:Name="indeterminateMark" Fill="{StaticResource Color.Static.Foreground}" Margin="2" Opacity="0" />
+                                </Grid>
+                            </Border>
+                            <ContentPresenter x:Name="contentPresenter" Grid.Column="1" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="HasContent" Value="true">
+                                <Setter Property="Padding" Value="4,-1,0,0" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="Background" TargetName="checkBoxBorder" Value="{StaticResource Color.MouseOver.Background}" />
+                                <Setter Property="BorderBrush" TargetName="checkBoxBorder" Value="{StaticResource Color.MouseOver.Border}" />
+                                <Setter Property="Fill" TargetName="optionMark" Value="{StaticResource Color.MouseOver.Foreground}" />
+                                <Setter Property="Fill" TargetName="indeterminateMark" Value="{StaticResource Color.MouseOver.Foreground}" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Background" TargetName="checkBoxBorder" Value="{StaticResource Color.Disabled.Background}" />
+                                <Setter Property="BorderBrush" TargetName="checkBoxBorder" Value="{StaticResource Color.Disabled.Border}" />
+                                <Setter Property="Fill" TargetName="optionMark" Value="{StaticResource Color.Disabled.Foreground}" />
+                                <Setter Property="Fill" TargetName="indeterminateMark" Value="{StaticResource Color.Disabled.Foreground}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="true">
+                                <Setter Property="Background" TargetName="checkBoxBorder" Value="{StaticResource Color.Pressed.Background}" />
+                                <Setter Property="BorderBrush" TargetName="checkBoxBorder" Value="{StaticResource Color.Pressed.Border}" />
+                                <Setter Property="Fill" TargetName="optionMark" Value="{StaticResource Color.Pressed.Foreground}" />
+                                <Setter Property="Fill" TargetName="indeterminateMark" Value="{StaticResource Color.Pressed.Foreground}" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="true">
+                                <Setter Property="Opacity" TargetName="optionMark" Value="1" />
+                                <Setter Property="Opacity" TargetName="indeterminateMark" Value="0" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="{x:Null}">
+                                <Setter Property="Opacity" TargetName="optionMark" Value="0" />
+                                <Setter Property="Opacity" TargetName="indeterminateMark" Value="1" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--___________________________________________________________________-->
+        <!--//____________________RichTextBox Dark Style______________________\\-->
+        <!--___________________________________________________________________-->
+
+        <Style x:Key="{x:Type TextBoxBase}" TargetType="{x:Type TextBoxBase}">
+            <Setter Property="Background" Value="{StaticResource Color.Static.Background}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Color.Static.Border}" />
+            <Setter Property="Foreground" Value="{StaticResource Color.Static.Foreground}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="KeyboardNavigation.TabNavigation" Value="None" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualStyle_Dark}" />
+            <Setter Property="AllowDrop" Value="true" />
+            <Setter Property="ScrollViewer.PanningMode" Value="VerticalFirst" />
+            <Setter Property="Stylus.IsFlicksEnabled" Value="False" />
+            <Setter Property="CaretBrush" Value="{StaticResource Color.Pressed.Foreground}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TextBoxBase}">
+                        <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True" CornerRadius="4">
+                            <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Opacity" TargetName="border" Value="0.56" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Color.MouseOver.Border}" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="true">
+                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Color.MouseOver.Border}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <MultiTrigger>
+                    <MultiTrigger.Conditions>
+                        <Condition Property="IsInactiveSelectionHighlightEnabled" Value="true" />
+                        <Condition Property="IsSelectionActive" Value="false" />
+                    </MultiTrigger.Conditions>
+                    <Setter Property="SelectionBrush" Value="{DynamicResource {x:Static SystemColors.InactiveSelectionHighlightBrushKey}}" />
+                </MultiTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="{x:Type Hyperlink}" TargetType="{x:Type Hyperlink}">
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}" />
+            <Setter Property="TextDecorations" Value="Underline" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="true">
+                    <Setter Property="Foreground" Value="Red" />
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="false">
+                    <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="true">
+                    <Setter Property="Cursor" Value="Hand" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="RichTextBoxStyle_Dark" TargetType="{x:Type RichTextBox}">
+            <Style.Resources>
+                <Style x:Key="{x:Type FlowDocument}" TargetType="{x:Type FlowDocument}">
+                    <Setter Property="OverridesDefaultStyle" Value="true" />
+                </Style>
+                <Style x:Key="{x:Type Hyperlink}" BasedOn="{StaticResource {x:Type Hyperlink}}" TargetType="{x:Type Hyperlink}">
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter Property="Foreground" Value="Blue" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Style.Resources>
+            <Setter Property="MinWidth" Value="10" />
+            <Style.BasedOn>
+                <StaticResource ResourceKey="{x:Type TextBoxBase}" />
+            </Style.BasedOn>
+        </Style>
+
+        <!--___________________________________________________________________-->
+        <!--//_____________________TextBlock Dark Style______________________\\-->
+        <!--___________________________________________________________________-->
+
+        <Style x:Key="TextBlockStyle_Dark" TargetType="{x:Type TextBlock}">
+            <Setter Property="TextWrapping" Value="NoWrap" />
+            <Setter Property="TextTrimming" Value="None" />
+            <Setter Property="Foreground" Value="{StaticResource Color.Static.Foreground}" />
+            <Setter Property="Background" Value="{StaticResource Color.Static.Background}" />
         </Style>
     </Application.Resources>
 </Application>

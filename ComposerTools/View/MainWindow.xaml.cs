@@ -1,4 +1,5 @@
-﻿using ComposerTools.Classes.FLStudio;
+﻿using ComposerTools.Classes.DLL_Injection;
+using ComposerTools.Classes.FLStudio;
 using ComposerTools.Classes.SystemInteraction;
 using System;
 using System.Runtime.InteropServices;
@@ -14,11 +15,7 @@ namespace ComposerTools.View
     /// Interaktionslogik für MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
-    {
-        
-
-
-        
+    {        
         public MainWindow()
         {
             InitializeComponent();
@@ -32,6 +29,16 @@ namespace ComposerTools.View
             FLStudio_Communicator.GetInstance().OpenFlStudio();
         }
 
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Injector.TryInject();
+            } catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.Message);
+            }
+        }
     }
 }
 

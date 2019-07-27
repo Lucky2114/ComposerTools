@@ -8,5 +8,6 @@
         Title="MainWindow" Height="450" Width="800" Style="{DynamicResource WindowStyle_Dark}">
     <Grid HorizontalAlignment="Left" Height="423" Margin="-4,0,-4,-4" VerticalAlignment="Top" Width="800">
         <Button Content="Open FL Studio 20" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="121" Height="35" Style="{DynamicResource ButtonStyle_Dark}" Click="Button_Click"/>
+        <Button x:Name="button" Content="Inject DLL" HorizontalAlignment="Left" Margin="136,10,0,0" VerticalAlignment="Top" Width="132" Height="35" Style="{DynamicResource ButtonStyle_Dark}" Click="Button_Click_1"/>
     </Grid>
 </Window>

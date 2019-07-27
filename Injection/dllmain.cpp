@@ -54,9 +54,12 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 
 			MessageBox(0, n2hexstr(fnl).c_str(), "Final Address To Call", MB_OK);
 
-			typedef int func(void);
+			/*typedef int func(void);
 			func* f = (func*)(fnl);
-			int j = f();
+			int j = f();*/
+
+			((void(*)(void))fnl)();
+
 			break;
 		}
 	}
