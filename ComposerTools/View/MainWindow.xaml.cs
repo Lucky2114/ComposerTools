@@ -15,7 +15,7 @@ namespace ComposerTools.View
     /// Interaktionslogik für MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
-    {        
+    {
         public MainWindow()
         {
             InitializeComponent();
@@ -33,8 +33,9 @@ namespace ComposerTools.View
         {
             try
             {
-                Injector.TryInject();
-            } catch (Exception ex)
+                Console.WriteLine(Injector.GetInstance.Inject("FL64", @"C:\Users\Kevin\Desktop\Visual Studio Projects\ComposerTools_Master\ComposerTools\x64\Debug\Injection.dll").ToString());
+            }
+            catch (Exception ex)
             {
                 System.Windows.MessageBox.Show(ex.Message);
             }

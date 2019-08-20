@@ -1,184 +1,133 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 
 namespace ComposerTools.Classes.DLL_Injection
 {
-    public static class Injector
+    public enum DllInjectionResult
     {
+        DllNotFound,
+        GameProcessNotFound,
+        InjectionFailed,
+        Success
+    }
 
+    public sealed class Injector
+    {
+        static readonly IntPtr INTPTR_ZERO = (IntPtr)0;
 
+        [DllImport("kernel32.dll", SetLastError = true)]
+        static extern IntPtr OpenProcess(uint dwDesiredAccess, int bInheritHandle, uint dwProcessId);
 
-        [DllImport("kernel32")]
-        public static extern IntPtr CreateRemoteThread(
-      IntPtr hProcess,
-      IntPtr lpThreadAttributes,
-      uint dwStackSize,
-      UIntPtr lpStartAddress, // raw Pointer into remote process 
-      IntPtr lpParameter,
-      uint dwCreationFlags,
-      out IntPtr lpThreadId
-    );
+        [DllImport("kernel32.dll", SetLastError = true)]
+        static extern int CloseHandle(IntPtr hObject);
 
-        [DllImport("kernel32.dll")]
-        public static extern IntPtr OpenProcess(
-            UInt32 dwDesiredAccess,
-            Int32 bInheritHandle,
-            Int32 dwProcessId
-            );
+        [DllImport("kernel32.dll", SetLastError = true)]
+        static extern IntPtr GetProcAddress(IntPtr hModule, string lpProcName);
 
-        [DllImport("kernel32.dll")]
-        public static extern Int32 CloseHandle(
-        IntPtr hObject
-        );
+        [DllImport("kernel32.dll", SetLastError = true)]
+        static extern IntPtr GetModuleHandle(string lpModuleName);
 
-        [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
-        static extern bool VirtualFreeEx(
-            IntPtr hProcess,
-            IntPtr lpAddress,
-            UIntPtr dwSize,
-            uint dwFreeType
-            );
+        [DllImport("kernel32.dll", SetLastError = true)]
+        static extern IntPtr VirtualAllocEx(IntPtr hProcess, IntPtr lpAddress, IntPtr dwSize, uint flAllocationType, uint flProtect);
 
-        [DllImport("kernel32.dll", CharSet = CharSet.Ansi, ExactSpelling = true)]
-        public static extern UIntPtr GetProcAddress(
-            IntPtr hModule,
-            string procName
-            );
+        [DllImport("kernel32.dll", SetLastError = true)]
+        static extern int WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, byte[] buffer, uint size, int lpNumberOfBytesWritten);
 
-        [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
-        static extern IntPtr VirtualAllocEx(
-            IntPtr hProcess,
-            IntPtr lpAddress,
-            uint dwSize,
-            uint flAllocationType,
-            uint flProtect
-            );
+        [DllImport("kernel32.dll", SetLastError = true)]
+        static extern IntPtr CreateRemoteThread(IntPtr hProcess, IntPtr lpThreadAttribute, IntPtr dwStackSize, IntPtr lpStartAddress,
+            IntPtr lpParameter, uint dwCreationFlags, IntPtr lpThreadId);
 
-        [DllImport("kernel32.dll")]
-        static extern bool WriteProcessMemory(
-            IntPtr hProcess,
-            IntPtr lpBaseAddress,
-            string lpBuffer,
-            UIntPtr nSize,
-            out IntPtr lpNumberOfBytesWritten
-        );
+        static Injector _instance;
 
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
-        public static extern IntPtr GetModuleHandle(
-            string lpModuleName
-            );
-
-        [DllImport("kernel32", SetLastError = true, ExactSpelling = true)]
-        internal static extern Int32 WaitForSingleObject(
-            IntPtr handle,
-            Int32 milliseconds
-            );
-
-        public static Int32 GetProcessId(String proc)
+        public static Injector GetInstance
         {
-            Process[] ProcList;
-            ProcList = Process.GetProcessesByName(proc);
-            return ProcList[0].Id;
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new Injector();
+                }
+                return _instance;
+            }
         }
 
-        // privileges
-        private const int PROCESS_CREATE_THREAD = 0x0002;
+        Injector() { }
 
-        private const int PROCESS_QUERY_INFORMATION = 0x0400;
-        private const int PROCESS_VM_OPERATION = 0x0008;
-        private const int PROCESS_VM_WRITE = 0x0020;
-        private const int PROCESS_VM_READ = 0x0010;
-
-        // used for memory allocation
-        private const uint MEM_COMMIT = 0x00001000;
-
-        private const uint MEM_RESERVE = 0x00002000;
-        private const uint PAGE_READWRITE = 4;
-
-        public static bool TryInject()
+        public DllInjectionResult Inject(string sProcName, string sDllPath)
         {
-            String strDLLName = @"C:\Users\Kevin\Desktop\Visual Studio Projects\ComposerTools_Master\ComposerTools\x64\Debug\Injection.dll";
-            String strProcessName = "FL64";
-
-            Int32 ProcID = GetProcessId(strProcessName);
-            if (ProcID >= 0)
+            if (!File.Exists(sDllPath))
             {
-                IntPtr hProcess = (IntPtr)OpenProcess(0x1F0FFF, 1, ProcID);
-                if (hProcess == null)
+                return DllInjectionResult.DllNotFound;
+            }
+
+            uint _procId = 0;
+
+            Process[] _procs = Process.GetProcesses();
+            for (int i = 0; i < _procs.Length; i++)
+            {
+                if (_procs[i].ProcessName == sProcName)
                 {
-                    Console.WriteLine("OpenProcess() Failed!");
-                    return false;
-                }
-                else
-                {
-                    InjectDLL(hProcess, strDLLName);
-                    return true;
+                    _procId = (uint)_procs[i].Id;
+                    break;
                 }
             }
-            else return false;
 
+            if (_procId == 0)
+            {
+                return DllInjectionResult.GameProcessNotFound;
+            }
+
+            if (!bInject(_procId, sDllPath))
+            {
+                return DllInjectionResult.InjectionFailed;
+            }
+
+            return DllInjectionResult.Success;
         }
 
-        private static void InjectDLL(IntPtr hProcess, String strDLLName)
+        bool bInject(uint pToBeInjected, string sDllPath)
         {
-            IntPtr bytesout;
+            IntPtr hndProc = OpenProcess((0x2 | 0x8 | 0x10 | 0x20 | 0x400), 1, pToBeInjected);
 
-            // Length of string containing the DLL file name +1 byte padding 
-            Int32 LenWrite = strDLLName.Length + 1;
-            // Allocate memory within the virtual address space of the target process 
-            IntPtr AllocMem = (IntPtr)VirtualAllocEx(hProcess, (IntPtr)null, (uint)LenWrite, 0x1000, 0x40); //allocation pour WriteProcessMemory 
-
-            // Write DLL file name to allocated memory in target process 
-            WriteProcessMemory(hProcess, AllocMem, strDLLName, (UIntPtr)LenWrite, out bytesout);
-            // Function pointer "Injector" 
-            UIntPtr Injector = (UIntPtr)GetProcAddress(GetModuleHandle("kernel32.dll"), "LoadLibraryA");
-
-            if (Injector == null)
+            if (hndProc == INTPTR_ZERO)
             {
-                Console.WriteLine(" Injector Error! \\n ");
-                // return failed 
-                return;
+                return false;
             }
 
-            // Create thread in target process, and store handle in hThread 
-            IntPtr hThread = (IntPtr)CreateRemoteThread(hProcess, (IntPtr)null, 0, Injector, AllocMem, 0, out bytesout);
-            // Make sure thread handle is valid 
-            if (hThread == null)
+            IntPtr lpLLAddress = GetProcAddress(GetModuleHandle("kernel32.dll"), "LoadLibraryA");
+
+            if (lpLLAddress == INTPTR_ZERO)
             {
-                //incorrect thread handle ... return failed 
-                Console.WriteLine(" hThread [ 1 ] Error! \\n ");
-                return;
+                return false;
             }
-            // Time-out is 10 seconds... 
-            int Result = WaitForSingleObject(hThread, 10 * 1000);
-            // Check whether thread timed out... 
-            if (Result == 0x00000080L || Result == 0x00000102L || Result == 0xFFFFFFFF)
+
+            IntPtr lpAddress = VirtualAllocEx(hndProc, (IntPtr)null, (IntPtr)sDllPath.Length, (0x1000 | 0x2000), 0X40);
+
+            if (lpAddress == INTPTR_ZERO)
             {
-                /* Thread timed out... */
-                Console.WriteLine(" hThread [ 2 ] Error! \\n ");
-                // Make sure thread handle is valid before closing... prevents crashes. 
-                if (hThread != null)
-                {
-                    //Close thread in target process 
-                    CloseHandle(hThread);
-                }
-                return;
+                return false;
             }
-            // Sleep thread for 1 second 
-            Thread.Sleep(1000);
-            // Clear up allocated space ( Allocmem ) 
-            VirtualFreeEx(hProcess, AllocMem, (UIntPtr)0, 0x8000);
-            // Make sure thread handle is valid before closing... prevents crashes. 
-            if (hThread != null)
+
+            byte[] bytes = Encoding.ASCII.GetBytes(sDllPath);
+
+            if (WriteProcessMemory(hndProc, lpAddress, bytes, (uint)bytes.Length, 0) == 0)
             {
-                //Close thread in target process 
-                CloseHandle(hThread);
+                return false;
             }
-            // return succeeded 
-            return;
+
+            var x = CreateRemoteThread(hndProc, (IntPtr)null, INTPTR_ZERO, lpLLAddress, lpAddress, 0, (IntPtr)null) == INTPTR_ZERO;
+            if (x)
+            {
+                return false;
+            }
+
+            CloseHandle(hndProc);
+
+            return true;
         }
     }
 }
