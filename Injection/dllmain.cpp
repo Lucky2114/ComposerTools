@@ -3,6 +3,8 @@
 #include <tlhelp32.h>
 #include <psapi.h>
 #include <string>
+#include <tchar.h>
+#include <iostream>
 
 using namespace std;
 
@@ -16,52 +18,101 @@ template <typename I> std::string n2hexstr(I w, size_t hex_len = sizeof(I) << 1)
 	return rc;
 }
 
-BOOL APIENTRY DllMain(HMODULE hModule,
-	DWORD  ul_reason_for_call,
-	LPVOID lpReserved
-)
+// Data struct to be shared between processes
+struct TSharedData
 {
+	DWORD dwOffset = 0;
+	HMODULE hModule = nullptr;
+	LPDWORD lpInit = nullptr;
+};
+// Name of the exported function you wish to call from the Launcher process
+#define DLL_REMOTEINIT_FUNCNAME "RemoteInit"
+// Size (in bytes) of data to be shared
+#define SHMEMSIZE sizeof(TSharedData)
+// Name of the shared file map (NOTE: Global namespaces must have the SeCreateGlobalPrivilege privilege)
+#define SHMEMNAME "Global\\Injection.dll_SHMEM"
+static HANDLE hMapFile;
+static LPVOID lpMemFile;
+
+void RemoteInit();
+
+void RemoteInit() 
+{
+	MessageBox(0, "RemoteCall Successful.", "Information", MB_OK | MB_ICONERROR);
+
+
+	//HWND hWnd = FindWindow(0, "FL Studio 20");
+	HWND hWnd = FindWindow("TFruityLoopsMainForm", 0);
+	if (hWnd == 0) {
+		MessageBox(0, "Error cannot find window.", "Error", MB_OK | MB_ICONERROR);
+	}
+	else {
+		DWORD proccess_ID;
+		GetWindowThreadProcessId(hWnd, &proccess_ID);
+
+		HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, proccess_ID);
+		HMODULE hModule = GetRemoteModuleHandle(proccess_ID, "flengine_x64.dll");
+
+		MODULEINFO mi;
+		GetModuleInformation(hProcess, hModule, &mi, sizeof(mi));
+
+		//Offset from flengine_x64.dll base addresss = 0x2498C0
+		//alt 0x2498DC
+		//new 0x1D9F90
+		int i = intptr_t(mi.lpBaseOfDll);
+
+		MessageBox(0, n2hexstr(i).c_str(), "Base Address", MB_OK);
+
+		int fnl = intptr_t(mi.lpBaseOfDll) + 0x2498DC;
+
+		MessageBox(0, n2hexstr(fnl).c_str(), "Final Address To Call", MB_OK);
+
+		/*typedef int func(void);
+		func* f = (func*)(fnl);
+		int j = f();*/
+
+		((void(*)(void))fnl)();
+	}
+}
+
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
+{
+	TSharedData data;
+
 	switch (ul_reason_for_call)
 	{
 	case DLL_PROCESS_ATTACH:
 	{
-		MessageBox(NULL, "Hello World!", "Dll says:", MB_OK);
-
-
-
-		HWND hWnd = FindWindow(0, "FL Studio 20");
-		if (hWnd == 0) {
-			MessageBox(0, "Error cannot find window.", "Error", MB_OK | MB_ICONERROR);
-		}
-		else {
-			DWORD proccess_ID;
-			GetWindowThreadProcessId(hWnd, &proccess_ID);
-
-			HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, proccess_ID);
-			HMODULE hModule = GetRemoteModuleHandle(proccess_ID, "flengine_x64.dll");
-
-			MODULEINFO mi;
-			GetModuleInformation(hProcess, hModule, &mi, sizeof(mi));
+		DisableThreadLibraryCalls(hModule);
+		// Get a handle to our file map
+		hMapFile = CreateFileMappingA(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0, SHMEMSIZE, SHMEMNAME);
+		if (hMapFile == nullptr) {
 			
-			//Offset from flengine_x64.dll base addresss = 0x2498C0
-			//alt 0x2498DC
-			int i = intptr_t(mi.lpBaseOfDll);
-
-			MessageBox(0, n2hexstr(i).c_str(), "Base Address", MB_OK);
-
-
-			int fnl = intptr_t(mi.lpBaseOfDll) + 0x2498C0;
-
-			MessageBox(0, n2hexstr(fnl).c_str(), "Final Address To Call", MB_OK);
-
-			/*typedef int func(void);
-			func* f = (func*)(fnl);
-			int j = f();*/
-
-			((void(*)(void))fnl)();
-
-			break;
+			DWORD tmp = GetLastError();
+			TCHAR s[100];
+			_stprintf_s(s, _T("%X"), tmp);
+			MessageBoxA(nullptr, s, "DLL_PROCESS_ATTACH", MB_OK | MB_ICONERROR);
+			return FALSE;
 		}
+
+		// Get our shared memory pointer
+		lpMemFile = MapViewOfFile(hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, 0);
+		if (lpMemFile == nullptr) {
+			MessageBoxA(nullptr, "Failed to map shared memory!", "DLL_PROCESS_ATTACH", MB_OK | MB_ICONERROR);
+			return FALSE;
+		}
+
+		// Set shared memory to hold what our remote process needs
+		memset(lpMemFile, 0, SHMEMSIZE);
+		data.hModule = hModule;
+		data.lpInit = LPDWORD(GetProcAddress(hModule, DLL_REMOTEINIT_FUNCNAME));
+		data.dwOffset = DWORD(data.lpInit) - DWORD(data.hModule);
+		memcpy(lpMemFile, &data, sizeof(TSharedData));
+
+
+		MessageBox(NULL, "Injection Successful!", "Success", MB_OK);
+
+		break;
 	}
 	case DLL_THREAD_ATTACH:
 	case DLL_THREAD_DETACH:
@@ -70,8 +121,6 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 	}
 	return TRUE;
 }
-
-
 
 HMODULE GetRemoteModuleHandle(DWORD lpProcessId, LPCSTR lpModule)
 {
@@ -87,8 +136,6 @@ HMODULE GetRemoteModuleHandle(DWORD lpProcessId, LPCSTR lpModule)
 		{
 			do
 			{
-				
-				
 				if (!_stricmp((me32.szModule), lpModule))
 				{
 					hResult = me32.hModule;
@@ -100,8 +147,3 @@ HMODULE GetRemoteModuleHandle(DWORD lpProcessId, LPCSTR lpModule)
 	}
 	return hResult;
 }
-
-
-
-
-

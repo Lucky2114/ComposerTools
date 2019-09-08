@@ -33,7 +33,7 @@ namespace ComposerTools.View
         {
             try
             {
-                Console.WriteLine(Injector.GetInstance.Inject("FL64", @"C:\Users\Kevin\Desktop\Visual Studio Projects\ComposerTools_Master\ComposerTools\x64\Debug\Injection.dll").ToString());
+                Console.WriteLine(Injector.GetInstance.Inject("FL64", @"C:\Users\Kevin\Source\Repos\ComposerTools\x64\Debug\Injection.dll").ToString());
             }
             catch (Exception ex)
             {

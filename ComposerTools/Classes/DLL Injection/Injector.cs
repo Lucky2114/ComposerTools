@@ -41,21 +41,11 @@ namespace ComposerTools.Classes.DLL_Injection
         static extern IntPtr CreateRemoteThread(IntPtr hProcess, IntPtr lpThreadAttribute, IntPtr dwStackSize, IntPtr lpStartAddress,
             IntPtr lpParameter, uint dwCreationFlags, IntPtr lpThreadId);
 
-        static Injector _instance;
+        private static Injector _instance;
 
-        public static Injector GetInstance
-        {
-            get
-            {
-                if (_instance == null)
-                {
-                    _instance = new Injector();
-                }
-                return _instance;
-            }
-        }
+        public static Injector GetInstance => _instance ?? (_instance = new Injector());
 
-        Injector() { }
+        private Injector() { }
 
         public DllInjectionResult Inject(string sProcName, string sDllPath)
         {
@@ -66,12 +56,11 @@ namespace ComposerTools.Classes.DLL_Injection
 
             uint _procId = 0;
 
-            Process[] _procs = Process.GetProcesses();
-            for (int i = 0; i < _procs.Length; i++)
+            foreach (var process in Process.GetProcesses())
             {
-                if (_procs[i].ProcessName == sProcName)
+                if (process.ProcessName.Equals(sProcName))
                 {
-                    _procId = (uint)_procs[i].Id;
+                    _procId = (uint)process.Id;
                     break;
                 }
             }
@@ -81,7 +70,7 @@ namespace ComposerTools.Classes.DLL_Injection
                 return DllInjectionResult.GameProcessNotFound;
             }
 
-            if (!bInject(_procId, sDllPath))
+            if (!BInject(_procId, sDllPath))
             {
                 return DllInjectionResult.InjectionFailed;
             }
@@ -89,7 +78,7 @@ namespace ComposerTools.Classes.DLL_Injection
             return DllInjectionResult.Success;
         }
 
-        bool bInject(uint pToBeInjected, string sDllPath)
+        bool BInject(uint pToBeInjected, string sDllPath)
         {
             IntPtr hndProc = OpenProcess((0x2 | 0x8 | 0x10 | 0x20 | 0x400), 1, pToBeInjected);
 
@@ -119,7 +108,8 @@ namespace ComposerTools.Classes.DLL_Injection
                 return false;
             }
 
-            var x = CreateRemoteThread(hndProc, (IntPtr)null, INTPTR_ZERO, lpLLAddress, lpAddress, 0, (IntPtr)null) == INTPTR_ZERO;
+            //Use CREATE_SUSPENDED (0x00000004) Flag.
+            var x = CreateRemoteThread(hndProc, (IntPtr)null, INTPTR_ZERO, lpLLAddress, lpAddress, 0x00000004, (IntPtr)null) == INTPTR_ZERO;
             if (x)
             {
                 return false;
