@@ -10,6 +10,7 @@ using namespace std;
 
 HMODULE GetRemoteModuleHandle(DWORD lpProcessId, LPCSTR lpModule);
 
+
 template <typename I> std::string n2hexstr(I w, size_t hex_len = sizeof(I) << 1) {
 	static const char* digits = "0123456789ABCDEF";
 	std::string rc(hex_len, '0');
@@ -18,27 +19,10 @@ template <typename I> std::string n2hexstr(I w, size_t hex_len = sizeof(I) << 1)
 	return rc;
 }
 
-// Data struct to be shared between processes
-struct TSharedData
+DWORD WINAPI ComposerThread(HMODULE hModule) 
 {
-	DWORD dwOffset = 0;
-	HMODULE hModule = nullptr;
-	LPDWORD lpInit = nullptr;
-};
-// Name of the exported function you wish to call from the Launcher process
-#define DLL_REMOTEINIT_FUNCNAME "RemoteInit"
-// Size (in bytes) of data to be shared
-#define SHMEMSIZE sizeof(TSharedData)
-// Name of the shared file map (NOTE: Global namespaces must have the SeCreateGlobalPrivilege privilege)
-#define SHMEMNAME "Global\\Injection.dll_SHMEM"
-static HANDLE hMapFile;
-static LPVOID lpMemFile;
-
-void RemoteInit();
-
-void RemoteInit() 
-{
-	MessageBox(0, "RemoteCall Successful.", "Information", MB_OK | MB_ICONERROR);
+	
+	MessageBox(NULL, "Thread Start!", "Success", MB_OK);
 
 
 	//HWND hWnd = FindWindow(0, "FL Studio 20");
@@ -59,11 +43,12 @@ void RemoteInit()
 		//Offset from flengine_x64.dll base addresss = 0x2498C0
 		//alt 0x2498DC
 		//new 0x1D9F90
+		//1DA007
 		int i = intptr_t(mi.lpBaseOfDll);
 
 		MessageBox(0, n2hexstr(i).c_str(), "Base Address", MB_OK);
 
-		int fnl = intptr_t(mi.lpBaseOfDll) + 0x2498DC;
+		int fnl = intptr_t(mi.lpBaseOfDll) + 0x1D9F90;
 
 		MessageBox(0, n2hexstr(fnl).c_str(), "Final Address To Call", MB_OK);
 
@@ -73,45 +58,44 @@ void RemoteInit()
 
 		((void(*)(void))fnl)();
 	}
+	return 0;
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
 {
-	TSharedData data;
-
 	switch (ul_reason_for_call)
 	{
 	case DLL_PROCESS_ATTACH:
 	{
-		DisableThreadLibraryCalls(hModule);
-		// Get a handle to our file map
-		hMapFile = CreateFileMappingA(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0, SHMEMSIZE, SHMEMNAME);
-		if (hMapFile == nullptr) {
-			
-			DWORD tmp = GetLastError();
-			TCHAR s[100];
-			_stprintf_s(s, _T("%X"), tmp);
-			MessageBoxA(nullptr, s, "DLL_PROCESS_ATTACH", MB_OK | MB_ICONERROR);
-			return FALSE;
-		}
+		//DisableThreadLibraryCalls(hModule);
+		//// Get a handle to our file map
+		//hMapFile = CreateFileMappingA(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0, SHMEMSIZE, SHMEMNAME);
+		//if (hMapFile == nullptr) {
 
-		// Get our shared memory pointer
-		lpMemFile = MapViewOfFile(hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, 0);
-		if (lpMemFile == nullptr) {
-			MessageBoxA(nullptr, "Failed to map shared memory!", "DLL_PROCESS_ATTACH", MB_OK | MB_ICONERROR);
-			return FALSE;
-		}
+		//	DWORD tmp = GetLastError();
+		//	TCHAR s[100];
+		//	_stprintf_s(s, _T("%X"), tmp);
+		//	MessageBoxA(nullptr, s, "DLL_PROCESS_ATTACH", MB_OK | MB_ICONERROR);
+		//	return FALSE;
+		//}
 
-		// Set shared memory to hold what our remote process needs
-		memset(lpMemFile, 0, SHMEMSIZE);
-		data.hModule = hModule;
-		data.lpInit = LPDWORD(GetProcAddress(hModule, DLL_REMOTEINIT_FUNCNAME));
-		data.dwOffset = DWORD(data.lpInit) - DWORD(data.hModule);
-		memcpy(lpMemFile, &data, sizeof(TSharedData));
+		//// Get our shared memory pointer
+		//lpMemFile = MapViewOfFile(hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, 0);
+		//if (lpMemFile == nullptr) {
+		//	MessageBoxA(nullptr, "Failed to map shared memory!", "DLL_PROCESS_ATTACH", MB_OK | MB_ICONERROR);
+		//	return FALSE;
+		//}
 
-
+		//// Set shared memory to hold what our remote process needs
+		//memset(lpMemFile, 0, SHMEMSIZE);
+		//data.hModule = hModule;
+		//data.lpInit = LPDWORD(GetProcAddress(hModule, DLL_REMOTEINIT_FUNCNAME));
+		//data.dwOffset = DWORD(data.lpInit) - DWORD(data.hModule);
+		//memcpy(lpMemFile, &data, sizeof(TSharedData));
 		MessageBox(NULL, "Injection Successful!", "Success", MB_OK);
 
+
+		CloseHandle(CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)ComposerThread, hModule, 0, nullptr));
 		break;
 	}
 	case DLL_THREAD_ATTACH:

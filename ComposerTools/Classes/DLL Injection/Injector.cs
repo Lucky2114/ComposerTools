@@ -7,117 +7,68 @@ using System.Threading;
 
 namespace ComposerTools.Classes.DLL_Injection
 {
-    public enum DllInjectionResult
+
+    public static class Injector
     {
-        DllNotFound,
-        GameProcessNotFound,
-        InjectionFailed,
-        Success
-    }
+        [DllImport("kernel32.dll")]
+        public static extern IntPtr OpenProcess(int dwDesiredAccess, bool bInheritHandle, int dwProcessId);
 
-    public sealed class Injector
-    {
-        static readonly IntPtr INTPTR_ZERO = (IntPtr)0;
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
+        public static extern IntPtr GetModuleHandle(string lpModuleName);
 
-        [DllImport("kernel32.dll", SetLastError = true)]
-        static extern IntPtr OpenProcess(uint dwDesiredAccess, int bInheritHandle, uint dwProcessId);
+        [DllImport("kernel32", CharSet = CharSet.Ansi, ExactSpelling = true, SetLastError = true)]
+        static extern IntPtr GetProcAddress(IntPtr hModule, string procName);
 
-        [DllImport("kernel32.dll", SetLastError = true)]
-        static extern int CloseHandle(IntPtr hObject);
+        [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
+        static extern IntPtr VirtualAllocEx(IntPtr hProcess, IntPtr lpAddress,
+            uint dwSize, uint flAllocationType, uint flProtect);
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        static extern IntPtr GetProcAddress(IntPtr hModule, string lpProcName);
+        static extern bool WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, byte[] lpBuffer, uint nSize, out UIntPtr lpNumberOfBytesWritten);
 
-        [DllImport("kernel32.dll", SetLastError = true)]
-        static extern IntPtr GetModuleHandle(string lpModuleName);
+        [DllImport("kernel32.dll")]
+        static extern IntPtr CreateRemoteThread(IntPtr hProcess,
+            IntPtr lpThreadAttributes, uint dwStackSize, IntPtr lpStartAddress, IntPtr lpParameter, uint dwCreationFlags, IntPtr lpThreadId);
 
-        [DllImport("kernel32.dll", SetLastError = true)]
-        static extern IntPtr VirtualAllocEx(IntPtr hProcess, IntPtr lpAddress, IntPtr dwSize, uint flAllocationType, uint flProtect);
+        // privileges
+        const int PROCESS_CREATE_THREAD = 0x0002;
+        const int PROCESS_QUERY_INFORMATION = 0x0400;
+        const int PROCESS_VM_OPERATION = 0x0008;
+        const int PROCESS_VM_WRITE = 0x0020;
+        const int PROCESS_VM_READ = 0x0010;
 
-        [DllImport("kernel32.dll", SetLastError = true)]
-        static extern int WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, byte[] buffer, uint size, int lpNumberOfBytesWritten);
+        // used for memory allocation
+        const uint MEM_COMMIT = 0x00001000;
+        const uint MEM_RESERVE = 0x00002000;
+        const uint PAGE_READWRITE = 4;
 
-        [DllImport("kernel32.dll", SetLastError = true)]
-        static extern IntPtr CreateRemoteThread(IntPtr hProcess, IntPtr lpThreadAttribute, IntPtr dwStackSize, IntPtr lpStartAddress,
-            IntPtr lpParameter, uint dwCreationFlags, IntPtr lpThreadId);
-
-        private static Injector _instance;
-
-        public static Injector GetInstance => _instance ?? (_instance = new Injector());
-
-        private Injector() { }
-
-        public DllInjectionResult Inject(string sProcName, string sDllPath)
+        public static int Inject(string processName, string dllPath)
         {
-            if (!File.Exists(sDllPath))
-            {
-                return DllInjectionResult.DllNotFound;
-            }
+            // the target process - I'm using a dummy process for this
+            // if you don't have one, open Task Manager and choose wisely
+            Process targetProcess = Process.GetProcessesByName(processName)[0];
 
-            uint _procId = 0;
+            // geting the handle of the process - with required privileges
+            IntPtr procHandle = OpenProcess(PROCESS_CREATE_THREAD | PROCESS_QUERY_INFORMATION | PROCESS_VM_OPERATION | PROCESS_VM_WRITE | PROCESS_VM_READ, false, targetProcess.Id);
 
-            foreach (var process in Process.GetProcesses())
-            {
-                if (process.ProcessName.Equals(sProcName))
-                {
-                    _procId = (uint)process.Id;
-                    break;
-                }
-            }
+            // searching for the address of LoadLibraryA and storing it in a pointer
+            IntPtr loadLibraryAddr = GetProcAddress(GetModuleHandle("kernel32.dll"), "LoadLibraryA");
 
-            if (_procId == 0)
-            {
-                return DllInjectionResult.GameProcessNotFound;
-            }
+            // name of the dll we want to inject
+            string dllName = dllPath;
 
-            if (!BInject(_procId, sDllPath))
-            {
-                return DllInjectionResult.InjectionFailed;
-            }
+            // alocating some memory on the target process - enough to store the name of the dll
+            // and storing its address in a pointer
+            IntPtr allocMemAddress = VirtualAllocEx(procHandle, IntPtr.Zero, (uint)((dllName.Length + 1) * Marshal.SizeOf(typeof(char))), MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 
-            return DllInjectionResult.Success;
-        }
+            // writing the name of the dll there
+            UIntPtr bytesWritten;
+            WriteProcessMemory(procHandle, allocMemAddress, Encoding.Default.GetBytes(dllName), (uint)((dllName.Length + 1) * Marshal.SizeOf(typeof(char))), out bytesWritten);
 
-        bool BInject(uint pToBeInjected, string sDllPath)
-        {
-            IntPtr hndProc = OpenProcess((0x2 | 0x8 | 0x10 | 0x20 | 0x400), 1, pToBeInjected);
+            // creating a thread that will call LoadLibraryA with allocMemAddress as argument
+            CreateRemoteThread(procHandle, IntPtr.Zero, 0, loadLibraryAddr, allocMemAddress, 0, IntPtr.Zero);
 
-            if (hndProc == INTPTR_ZERO)
-            {
-                return false;
-            }
-
-            IntPtr lpLLAddress = GetProcAddress(GetModuleHandle("kernel32.dll"), "LoadLibraryA");
-
-            if (lpLLAddress == INTPTR_ZERO)
-            {
-                return false;
-            }
-
-            IntPtr lpAddress = VirtualAllocEx(hndProc, (IntPtr)null, (IntPtr)sDllPath.Length, (0x1000 | 0x2000), 0X40);
-
-            if (lpAddress == INTPTR_ZERO)
-            {
-                return false;
-            }
-
-            byte[] bytes = Encoding.ASCII.GetBytes(sDllPath);
-
-            if (WriteProcessMemory(hndProc, lpAddress, bytes, (uint)bytes.Length, 0) == 0)
-            {
-                return false;
-            }
-
-            //Use CREATE_SUSPENDED (0x00000004) Flag.
-            var x = CreateRemoteThread(hndProc, (IntPtr)null, INTPTR_ZERO, lpLLAddress, lpAddress, 0x00000004, (IntPtr)null) == INTPTR_ZERO;
-            if (x)
-            {
-                return false;
-            }
-
-            CloseHandle(hndProc);
-
-            return true;
+            return 0;
         }
     }
 }

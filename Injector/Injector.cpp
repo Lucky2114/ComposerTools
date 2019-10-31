@@ -194,5 +194,7 @@ void callRemoteFunction()
 		auto hThread = CreateRemoteThread(hProcess, nullptr, 0, LPTHREAD_START_ROUTINE(data.lpInit), nullptr, 0, &dwThreadId);
 		cerr << "Thread Id" << endl;
 		cerr << hThread << endl;
+
+		ResumeThread(hThread);
 	}
 }
